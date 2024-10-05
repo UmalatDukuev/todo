@@ -1,5 +1,9 @@
 package service
 
+import (
+	"todo/pkg/repository"
+)
+
 type Authorization interface {
 }
 

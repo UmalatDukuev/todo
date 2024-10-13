@@ -16,7 +16,6 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-
 	auth := router.Group("/auth")
 	{
 		auth.POST("sign-up", h.signUp)
@@ -25,7 +24,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api")
 	{
-		lists := api.Group("/lists")
+		lists := api.Group("/lists", h.userIdentity)
 		{
 			lists.POST("/", h.createList)
 			lists.GET("/", h.getAllLists)
@@ -37,7 +36,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				items.POST("/", h.createItem)
 				items.GET("/", h.getAllItems)
-				items.GET("/:item_id", h.getAllItems)
+				items.GET("/:item_id", h.getItemById)
 				items.PUT("/:item_id", h.updateItem)
 				items.DELETE("/:item_id", h.deleteItem)
 			}

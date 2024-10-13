@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"todo"
 
@@ -10,11 +9,6 @@ import (
 
 func (h *Handler) createList(c *gin.Context) {
 	userId, err := getUserId(c)
-	fmt.Println(11111111)
-
-	fmt.Println(c.Request)
-	fmt.Println(222222222)
-
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

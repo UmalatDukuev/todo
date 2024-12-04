@@ -4,16 +4,14 @@ import (
 	"log"
 
 	"github.com/UmalatDukuev/todo"
+	"github.com/UmalatDukuev/todo/pkg/handler"
 )
 
 func main() {
-	handlers := new(handler.InitRoutes)
+	handlers := new(handler.Handler)
 	srv := new(todo.Server)
-	go func() {
-		// if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		if err := srv.Run("8080", handlers.InitRoutes()); err != nil {
-			log.Fatalf("error occured while running http server: %s", err.Error())
-		}
-	}()
-
+	// if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+	if err := srv.Run("8080", handlers.InitRoutes()); err != nil {
+		log.Fatalf("error occured while running http server: %s", err.Error())
+	}
 }

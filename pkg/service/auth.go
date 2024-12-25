@@ -7,6 +7,7 @@ import (
 
 	"github.com/UmalatDukuev/todo"
 	"github.com/UmalatDukuev/todo/pkg/repository"
+	"github.com/golang-jwt/jwt"
 )
 
 const (
@@ -15,14 +16,17 @@ const (
 	tokenTTL   = 12 * time.Hour
 )
 
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+type tokenClaims struct {
+	jwt.StandardClaims
+	UserId int `json:"user_id"`
 }
-
 type AuthService struct {
 	repo repository.Authorization
 }
 
+func NewAuthService(repo repository.Authorization) *AuthService {
+	return &AuthService{repo: repo}
+}
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
@@ -33,4 +37,21 @@ func generatePasswordHash(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func (s *AuthService) GenerateToken(username, password string) (string, error) {
+	user, err := s.repo.GetUser(username, generatePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		user.Id,
+	})
+
+	return token.SignedString([]byte(signingKey))
 }
